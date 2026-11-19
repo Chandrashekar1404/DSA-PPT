@@ -1,0 +1,1016 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>DSA with Python | Interactive Workshop</title>
+    <style>
+        :root {
+            --bg: #0b1220;
+            --panel: #121d31;
+            --panel2: #18263d;
+            --text: #eef4ff;
+            --muted: #a9b8d0;
+            --accent: #62d6c5;
+            --accent2: #8ca8ff;
+            --yellow: #ffd166;
+            --red: #ff7b89;
+            --line: #2b3b55
+        }
+
+        * {
+            box-sizing: border-box
+        }
+
+        body {
+            margin: 0;
+            background: var(--bg);
+            color: var(--text);
+            font: 16px/1.5 Inter, Segoe UI, Arial, sans-serif;
+            overflow: hidden
+        }
+
+        .deck {
+            height: 100vh;
+            width: 100vw;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 24px
+        }
+
+        .slide {
+            display: none;
+            width: min(1200px, 96vw);
+            height: min(690px, 92vh);
+            overflow: auto;
+            background: linear-gradient(145deg, #111c30, #0e1728);
+            border: 1px solid var(--line);
+            border-radius: 22px;
+            padding: clamp(22px, 4vw, 54px);
+            box-shadow: 0 24px 80px #0008;
+            position: relative
+        }
+
+        .slide.active {
+            display: block;
+            animation: appear .22s ease
+        }
+
+        @keyframes appear {
+            from {
+                opacity: .35;
+                transform: translateY(8px)
+            }
+
+            to {
+                opacity: 1;
+                transform: none
+            }
+        }
+
+        .kicker {
+            color: var(--accent);
+            font-size: .78rem;
+            font-weight: 800;
+            letter-spacing: .16em;
+            text-transform: uppercase
+        }
+
+        h1 {
+            font-size: clamp(2.5rem, 6vw, 5.2rem);
+            line-height: 1.03;
+            margin: 18px 0
+        }
+
+        h2 {
+            font-size: clamp(1.8rem, 4vw, 3rem);
+            line-height: 1.1;
+            margin: 10px 0 22px
+        }
+
+        h3 {
+            color: var(--accent);
+            margin: 12px 0 6px
+        }
+
+        p,
+        li {
+            color: #d9e4f5;
+            font-size: clamp(1rem, 1.45vw, 1.2rem)
+        }
+
+        .muted {
+            color: var(--muted)
+        }
+
+        .accent {
+            color: var(--accent)
+        }
+
+        .hero {
+            max-width: 850px
+        }
+
+        .tag {
+            display: inline-block;
+            border: 1px solid #3a5572;
+            border-radius: 999px;
+            padding: 7px 13px;
+            color: var(--muted);
+            margin: 5px 6px 5px 0;
+            font-size: .9rem
+        }
+
+        .grid {
+            display: grid;
+            grid-template-columns: repeat(2, minmax(0, 1fr));
+            gap: 16px
+        }
+
+        .grid.three {
+            grid-template-columns: repeat(3, minmax(0, 1fr))
+        }
+
+        .card {
+            background: var(--panel);
+            border: 1px solid var(--line);
+            border-radius: 16px;
+            padding: 18px
+        }
+
+        .card strong {
+            color: var(--accent)
+        }
+
+        .big {
+            font-size: 1.45rem;
+            font-weight: 800
+        }
+
+        .analogy {
+            border-left: 4px solid var(--yellow);
+            padding: 12px 16px;
+            background: #ffd16612;
+            border-radius: 8px;
+            margin: 14px 0
+        }
+
+        .codebox {
+            background: #070d17;
+            border: 1px solid #26364e;
+            border-radius: 14px;
+            overflow: hidden;
+            margin: 12px 0
+        }
+
+        .codehead {
+            padding: 9px 14px;
+            background: #142239;
+            color: var(--muted);
+            font-size: .85rem;
+            display: flex;
+            justify-content: space-between
+        }
+
+        pre {
+            margin: 0;
+            padding: 16px;
+            overflow: auto;
+            color: #d7e8ff;
+            font: 15px/1.55 Consolas, monospace;
+            white-space: pre
+        }
+
+        .output {
+            background: #071b1b;
+            color: #9ff1d9;
+            padding: 12px 16px;
+            min-height: 42px;
+            font: 14px/1.5 Consolas, monospace;
+            white-space: pre-wrap;
+            border-top: 1px solid #23463f
+        }
+
+        .btn {
+            border: 0;
+            border-radius: 10px;
+            padding: 10px 16px;
+            background: var(--accent);
+            color: #071522;
+            font-weight: 800;
+            cursor: pointer
+        }
+
+        .btn.secondary {
+            background: #253752;
+            color: var(--text);
+            border: 1px solid #405673
+        }
+
+        .btn:disabled {
+            opacity: .4;
+            cursor: not-allowed
+        }
+
+        .controls {
+            display: flex;
+            gap: 10px;
+            flex-wrap: wrap;
+            margin-top: 14px
+        }
+
+        .nav {
+            position: fixed;
+            bottom: 16px;
+            left: 50%;
+            transform: translateX(-50%);
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            background: #111d30ee;
+            border: 1px solid var(--line);
+            padding: 9px 12px;
+            border-radius: 16px;
+            z-index: 10;
+            backdrop-filter: blur(12px)
+        }
+
+        .nav button {
+            background: #253752;
+            color: white;
+            border: 1px solid #405673;
+            border-radius: 9px;
+            padding: 9px 14px;
+            cursor: pointer
+        }
+
+        .nav button:disabled {
+            opacity: .35
+        }
+
+        .progress {
+            width: 130px;
+            height: 5px;
+            background: #2b3b55;
+            border-radius: 9px;
+            overflow: hidden
+        }
+
+        .progress span {
+            display: block;
+            height: 100%;
+            background: var(--accent);
+            width: 0
+        }
+
+        .counter {
+            color: var(--muted);
+            font-size: .85rem;
+            min-width: 55px;
+            text-align: center
+        }
+
+        .pill {
+            background: #20364a;
+            color: var(--accent);
+            border-radius: 8px;
+            padding: 3px 8px;
+            font-size: .8rem
+        }
+
+        .visual {
+            font-family: Consolas, monospace;
+            display: flex;
+            gap: 8px;
+            flex-wrap: wrap;
+            margin: 15px 0
+        }
+
+        .cell {
+            border: 1px solid #55708f;
+            background: #192a43;
+            padding: 12px 15px;
+            border-radius: 9px;
+            min-width: 48px;
+            text-align: center
+        }
+
+        .cell.hot {
+            background: #17695f;
+            border-color: var(--accent);
+            color: white
+        }
+
+        .cell.dim {
+            opacity: .35
+        }
+
+        .quiz-option {
+            display: block;
+            width: 100%;
+            text-align: left;
+            margin: 8px 0;
+            background: #192a43;
+            color: var(--text);
+            border: 1px solid #3a506d;
+            border-radius: 10px;
+            padding: 12px;
+            cursor: pointer
+        }
+
+        .quiz-option.correct {
+            border-color: var(--accent);
+            background: #123c39
+        }
+
+        .quiz-option.wrong {
+            border-color: var(--red);
+            background: #49232e
+        }
+
+        .feedback {
+            min-height: 26px;
+            color: var(--yellow);
+            margin-top: 8px
+        }
+
+        .small {
+            font-size: .9rem
+        }
+
+        .table {
+            width: 100%;
+            border-collapse: collapse;
+            margin: 12px 0
+        }
+
+        .table th,
+        .table td {
+            padding: 10px;
+            border-bottom: 1px solid var(--line);
+            text-align: left
+        }
+
+        .table th {
+            color: var(--accent)
+        }
+
+        .split {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 20px;
+            align-items: center
+        }
+
+        .bar {
+            height: 12px;
+            border-radius: 9px;
+            background: #263953;
+            margin: 8px 0 14px;
+            overflow: hidden
+        }
+
+        .bar span {
+            display: block;
+            height: 100%;
+            background: linear-gradient(90deg, var(--accent), var(--accent2))
+        }
+
+        .footer-note {
+            position: absolute;
+            bottom: 18px;
+            right: 26px;
+            color: #72849e;
+            font-size: .75rem
+        }
+
+        @media(max-width:700px) {
+            body {
+                overflow: auto
+            }
+
+            .deck {
+                padding: 10px;
+                min-height: 100vh;
+                height: auto
+            }
+
+            .slide {
+                height: auto;
+                min-height: 88vh;
+                padding: 22px 18px 80px
+            }
+
+            .grid,
+            .grid.three,
+            .split {
+                grid-template-columns: 1fr
+            }
+
+            .nav {
+                bottom: 8px;
+                width: calc(100% - 16px);
+                justify-content: center
+            }
+
+            .progress {
+                width: 70px
+            }
+
+            pre {
+                font-size: 12px
+            }
+        }
+
+        @media print {
+            body {
+                overflow: visible;
+                background: white;
+                color: #111
+            }
+
+            .deck {
+                display: block;
+                height: auto;
+                padding: 0
+            }
+
+            .slide {
+                display: block !important;
+                page-break-after: always;
+                width: 100%;
+                height: auto;
+                min-height: 95vh;
+                box-shadow: none;
+                background: white;
+                color: #111;
+                border: 0
+            }
+
+            .slide p,
+            .slide li {
+                color: #222
+            }
+
+            .nav {
+                display: none
+            }
+
+            .card {
+                background: #f2f5f8;
+                color: #111
+            }
+
+            .codebox {
+                break-inside: avoid
+            }
+        }
+    </style>
+</head>
+
+<body>
+    <div class="deck">
+        <section class="slide active">
+            <div class="kicker">College workshop • Python edition</div>
+            <div class="hero">
+                <h1>DSA <span class="accent">with Python</span></h1>
+                <p class="big">From real-world problem solving to coding interviews</p>
+                <p class="muted">An interactive 75–90 minute workshop</p>
+                <div style="margin-top:28px"><span class="tag">Data Structures</span><span
+                        class="tag">Algorithms</span><span class="tag">Big O</span><span class="tag">Live coding</span>
+                </div>
+            </div>
+            <div class="footer-note">Use ← → keys or navigation buttons</div>
+        </section>
+
+        <section class="slide">
+            <div class="kicker">01 • Hook</div>
+            <h2>How do everyday apps solve big problems?</h2>
+            <div class="grid three">
+                <div class="card">
+                    <div class="big">🛒 Amazon</div>
+                    <p>Search across millions of products in seconds.</p>
+                </div>
+                <div class="card">
+                    <div class="big">🗺️ Maps</div>
+                    <p>Compare routes and suggest a useful path.</p>
+                </div>
+                <div class="card">
+                    <div class="big">📱 Social apps</div>
+                    <p>Organize connections and rank content.</p>
+                </div>
+            </div>
+            <div class="analogy"><strong>Ask the room:</strong> Does a person manually inspect every record? What kind
+                of logic could make this fast?</div>
+            <p>These systems depend on ways to organize data and procedures to process it efficiently. That is where DSA
+                comes in.</p>
+        </section>
+
+        <section class="slide">
+            <div class="kicker">02 • Foundation</div>
+            <h2>What exactly is DSA?</h2>
+            <div class="grid">
+                <div class="card">
+                    <h3>Data Structure</h3>
+                    <p>A way to organize and store data so it can be accessed or modified effectively.</p>
+                    <div class="big">How is data organized?</div>
+                </div>
+                <div class="card">
+                    <h3>Algorithm</h3>
+                    <p>A finite, clear sequence of steps used to solve a problem.</p>
+                    <div class="big">How do we solve it?</div>
+                </div>
+            </div>
+            <div class="analogy"><strong>Library analogy:</strong> Shelves organize books (data structure). The steps
+                you follow to locate a particular book (algorithm).</div>
+            <p><strong>Tea-making algorithm:</strong> Boil water → add tea → add milk/sugar → simmer → filter → serve.
+            </p>
+        </section>
+
+        <section class="slide">
+            <div class="kicker">03 • Industry relevance</div>
+            <h2>Why should a developer learn DSA?</h2>
+            <ul>
+                <li>Build problem-solving ability.</li>
+                <li>Handle large datasets more effectively.</li>
+                <li>Understand performance and scalability.</li>
+                <li>Prepare for technical interviews.</li>
+                <li>Choose a suitable approach instead of just making code work.</li>
+            </ul>
+            <div class="analogy"><strong>Ask:</strong> If two programs return the same answer, but one takes 2 seconds
+                and another takes 2 minutes, which would you choose?</div>
+        </section>
+
+        <section class="slide">
+            <div class="kicker">04 • Data structures</div>
+            <h2>Python collections: choose the right container</h2>
+            <div class="grid">
+                <div class="card">
+                    <h3>List</h3>
+                    <p>Ordered, changeable collection.</p><span class="pill">Shopping cart / marks</span>
+                    <pre>marks = [85, 90, 75]
+print(marks[0])  # 85
+marks.append(95)</pre>
+                </div>
+                <div class="card">
+                    <h3>Tuple</h3>
+                    <p>Ordered, immutable collection.</p><span class="pill">Fixed record / coordinates</span>
+                    <pre>student = ("Ravi", 21, "ECE")
+print(student[0])  # Ravi</pre>
+                </div>
+                <div class="card">
+                    <h3>Set</h3>
+                    <p>Unique elements; no guaranteed order.</p><span class="pill">Unique registrations</span>
+                    <pre>ids = [101, 102, 101, 103]
+print(set(ids))</pre>
+                </div>
+                <div class="card">
+                    <h3>Dictionary</h3>
+                    <p>Key-value mapping.</p><span class="pill">Phone contacts</span>
+                    <pre>phonebook = {"Ravi": 9876}
+print(phonebook["Ravi"])</pre>
+                </div>
+            </div>
+        </section>
+
+        <section class="slide">
+            <div class="kicker">05 • List demo</div>
+            <h2>Live example: student marks</h2>
+            <p>A list is like a row of labeled slots. Python indexing starts at zero.</p>
+            <div class="visual" id="listVisual"><span class="cell">85<br><small>0</small></span><span
+                    class="cell">90<br><small>1</small></span><span class="cell">75<br><small>2</small></span></div>
+            <div class="controls"><button class="btn" onclick="listAdd()">Add 95</button><button class="btn secondary"
+                    onclick="listAccess()">Access index 2</button><button class="btn secondary"
+                    onclick="listReset()">Reset</button></div>
+            <div class="output" id="listOut">Try an action. The list updates here.</div>
+            <div class="analogy">Ask: What index accesses the third element? <strong>Answer: 2.</strong></div>
+        </section>
+
+        <section class="slide">
+            <div class="kicker">06 • Stack</div>
+            <h2>Stack = LIFO</h2>
+            <div class="split">
+                <div>
+                    <p><strong>Last In, First Out.</strong></p>
+                    <p>Think of plates stacked in a cafeteria. The top plate is removed first.</p>
+                    <ul>
+                        <li>Push: add to top</li>
+                        <li>Pop: remove top</li>
+                        <li>Peek: inspect top</li>
+                    </ul>
+                    <p>Uses: undo, browser history, function calls.</p>
+                </div>
+                <div class="card">
+                    <h3>Try push and pop</h3>
+                    <div class="visual" id="stackVisual"></div>
+                    <div class="controls"><button class="btn" onclick="stackPush()">Push item</button><button
+                            class="btn secondary" onclick="stackPop()">Pop item</button></div>
+                    <div class="output" id="stackOut">Stack is empty.</div>
+                </div>
+            </div>
+        </section>
+
+        <section class="slide">
+            <div class="kicker">07 • Queue</div>
+            <h2>Queue = FIFO</h2>
+            <div class="split">
+                <div>
+                    <p><strong>First In, First Out.</strong></p>
+                    <p>Think of a ticket counter. The person who arrives first is served first.</p>
+                    <ul>
+                        <li>Enqueue: join the rear</li>
+                        <li>Dequeue: leave from the front</li>
+                    </ul>
+                    <p>Uses: print jobs, task scheduling, request handling.</p>
+                </div>
+                <div class="card">
+                    <h3>Try the queue</h3>
+                    <div class="visual" id="queueVisual"></div>
+                    <div class="controls"><button class="btn" onclick="queueAdd()">Add person</button><button
+                            class="btn secondary" onclick="queueRemove()">Serve next</button></div>
+                    <div class="output" id="queueOut">Queue is empty.</div>
+                </div>
+            </div>
+        </section>
+
+        <section class="slide">
+            <div class="kicker">08 • Connected structures</div>
+            <h2>Linked list, tree and graph</h2>
+            <div class="grid three">
+                <div class="card">
+                    <h3>Linked List</h3>
+                    <p>Treasure-hunt clues: each clue points to the next.</p>
+                    <pre>[A] → [B] → [C] → None</pre>
+                    <p class="small">Nodes hold data and links.</p>
+                </div>
+                <div class="card">
+                    <h3>Tree</h3>
+                    <p>College hierarchy: principal, HODs, faculty.</p>
+                    <pre>       Root
+      /    \\
+   Node    Node</pre>
+                    <p class="small">Represents hierarchy.</p>
+                </div>
+                <div class="card">
+                    <h3>Graph</h3>
+                    <p>Social network: people connected by relationships.</p>
+                    <pre>A —— B
+|   / |
+C —— D</pre>
+                    <p class="small">Nodes and edges model connections.</p>
+                </div>
+            </div>
+            <p>Applications: file systems, database indexes, maps, social networks and routing.</p>
+        </section>
+
+        <section class="slide">
+            <div class="kicker">09 • Algorithms</div>
+            <h2>Algorithm = a repeatable recipe</h2>
+            <p>Problem: Find the highest mark in a list.</p>
+            <div class="grid">
+                <div class="card">
+                    <h3>Steps</h3>
+                    <ol>
+                        <li>Assume first mark is highest.</li>
+                        <li>Compare each next mark.</li>
+                        <li>Update highest when a larger value appears.</li>
+                        <li>Return the highest value.</li>
+                    </ol>
+                </div>
+                <div class="card">
+                    <h3>Python</h3>
+                    <pre>marks = [65, 85, 72, 95, 80]
+highest = marks[0]
+
+for mark in marks:
+    if mark > highest:
+        highest = mark
+
+print(highest)  # 95</pre>
+                </div>
+            </div>
+            <div class="analogy">Ask students to predict how <code>highest</code> changes: 65 → 85 → 85 → 95 → 95.</div>
+        </section>
+
+        <section class="slide">
+            <div class="kicker">10 • Searching</div>
+            <h2>Linear search</h2>
+            <div class="analogy">Classroom analogy: check roll numbers one by one until the target is found.</div>
+            <div class="codebox">
+                <div class="codehead">Python example <span class="pill">Run demo</span></div>
+                <pre>numbers = [10, 20, 30, 40, 50, 60]
+target = 40
+found = False
+
+for num in numbers:
+    if num == target:
+        found = True
+        break
+
+print("Element found" if found else "Not found")</pre>
+                <div class="output" id="linearOut">Press Run to execute the example.</div>
+            </div>
+            <div class="controls"><button class="btn" onclick="runLinear()">Run linear search</button><button
+                    class="btn secondary" onclick="runLinearMissing()">Search for 100</button></div>
+            <p><strong>Complexity:</strong> Best O(1), worst O(n).</p>
+        </section>
+
+        <section class="slide">
+            <div class="kicker">11 • Searching</div>
+            <h2>Binary search: halve the search space</h2>
+            <p>Dictionary analogy: open near the middle, then choose the left or right half.</p>
+            <div class="visual" id="binaryVisual"></div>
+            <div class="controls"><button class="btn" onclick="binaryStep()">Next step</button><button
+                    class="btn secondary" onclick="binaryReset()">Reset</button></div>
+            <div class="output" id="binaryOut">Find 60 in the sorted list. Press Next step.</div>
+            <div class="analogy"><strong>Important:</strong> Binary search requires sorted data. Worst-case complexity:
+                O(log n).</div>
+        </section>
+
+        <section class="slide">
+            <div class="kicker">12 • Sorting</div>
+            <h2>Bubble sort: compare neighbors</h2>
+            <p>Line up students by height. Compare adjacent students and swap if they are in the wrong order.</p>
+            <div class="visual" id="bubbleVisual"></div>
+            <div class="controls"><button class="btn" onclick="bubbleStep()">Next comparison</button><button
+                    class="btn secondary" onclick="bubbleReset()">Reset</button><button class="btn secondary"
+                    onclick="bubbleRun()">Finish sorting</button></div>
+            <div class="output" id="bubbleOut">Watch adjacent values swap until sorted. Worst case: O(n²).</div>
+        </section>
+
+        <section class="slide">
+            <div class="kicker">13 • Big O</div>
+            <h2>Time complexity: how work grows</h2>
+            <p>Big O describes how an algorithm's resource use grows as input size grows. It is not a stopwatch
+                measurement.</p>
+            <div class="grid">
+                <div class="card">
+                    <h3>O(1) • Constant</h3>
+                    <p>Access one list index.</p>
+                    <pre>print(items[2])</pre>
+                </div>
+                <div class="card">
+                    <h3>O(log n) • Logarithmic</h3>
+                    <p>Binary search halves the range.</p>
+                    <pre>while low <= high:
+    mid = (low + high) // 2</pre>
+                </div>
+                <div class="card">
+                    <h3>O(n) • Linear</h3>
+                    <p>Visit each item once.</p>
+                    <pre>for item in items:
+    print(item)</pre>
+                </div>
+                <div class="card">
+                    <h3>O(n²) • Quadratic</h3>
+                    <p>Compare every pair.</p>
+                    <pre>for a in items:
+    for b in items:
+        compare(a, b)</pre>
+                </div>
+            </div>
+        </section>
+
+        <section class="slide">
+            <div class="kicker">14 • Compare growth</div>
+            <h2>Same input size, very different work</h2>
+            <p>Illustrative operation-growth comparison for n = 1,000 (log base 2).</p>
+            <div id="complexityBars"></div>
+            <div class="analogy">O(n log n) is approximately 10,000 growth units here. O(n²) is 1,000,000. This is why
+                algorithm choice matters as data grows.</div>
+        </section>
+
+        <section class="slide">
+            <div class="kicker">15 • Space complexity</div>
+            <h2>Memory matters too</h2>
+            <div class="grid">
+                <div class="card">
+                    <h3>Constant extra space • O(1)</h3>
+                    <pre>numbers = [10, 20, 30]
+first = numbers[0]
+print(first)</pre>
+                    <p>Only a fixed amount of extra working memory.</p>
+                </div>
+                <div class="card">
+                    <h3>Linear extra space • O(n)</h3>
+                    <pre>numbers = [10, 20, 30]
+doubled = []
+
+for x in numbers:
+    doubled.append(x * 2)</pre>
+                    <p>The new list grows with the input.</p>
+                </div>
+            </div>
+            <p><strong>Ask:</strong> Does my solution use more time, more memory, or both?</p>
+        </section>
+
+        <section class="slide">
+            <div class="kicker">16 • Live challenge</div>
+            <h2>Challenge 1: second-largest distinct mark</h2>
+            <p>Given marks <code>[45, 90, 65, 80, 95]</code>, find the second-largest distinct value.</p>
+            <div class="codebox">
+                <div class="codehead">Python solution <span class="pill">Run demo</span></div>
+                <pre>marks = [45, 90, 65, 80, 95]
+unique_marks = sorted(set(marks), reverse=True)
+
+if len(unique_marks) >= 2:
+    print(unique_marks[1])
+else:
+    print("Second largest does not exist")</pre>
+                <div class="output" id="secondOut">Press Run to reveal the result.</div>
+            </div>
+            <button class="btn" onclick="document.getElementById('secondOut').textContent='90'">Run challenge</button>
+            <p class="small muted">Interview follow-up: solve it without sorting or using set.</p>
+        </section>
+
+        <section class="slide">
+            <div class="kicker">17 • Live challenge</div>
+            <h2>Challenge 2: count votes</h2>
+            <p>Use a dictionary to count how many votes each candidate received.</p>
+            <div class="codebox">
+                <div class="codehead">Python solution <span class="pill">Run demo</span></div>
+                <pre>votes = ["Ravi", "Kiran", "Ravi",
+         "Sneha", "Kiran", "Ravi"]
+frequency = {}
+
+for vote in votes:
+    if vote in frequency:
+        frequency[vote] += 1
+    else:
+        frequency[vote] = 1
+
+print(frequency)</pre>
+                <div class="output" id="votesOut">Press Run to reveal the result.</div>
+            </div>
+            <button class="btn"
+                onclick="document.getElementById('votesOut').textContent='Ravi: 3\\nKiran: 2\\nSneha: 1'">Run
+                challenge</button>
+        </section>
+
+        <section class="slide">
+            <div class="kicker">18 • Live challenge</div>
+            <h2>Challenge 3: palindrome</h2>
+            <p>A palindrome reads the same forward and backward: MADAM, LEVEL.</p>
+            <div class="card"><label for="palInput">Try your own word</label><input id="palInput" value="madam"
+                    style="display:block;width:100%;margin:8px 0;padding:12px;border-radius:8px;border:1px solid #456;background:#0b1525;color:white;font-size:1rem"><button
+                    class="btn" onclick="checkPalindrome()">Check word</button>
+                <div class="output" id="palOut">Enter a word and check it.</div>
+            </div>
+            <p class="small muted">Python idea: <code>word == word[::-1]</code></p>
+        </section>
+
+        <section class="slide">
+            <div class="kicker">19 • Learning roadmap</div>
+            <h2>What should you learn after this?</h2>
+            <div class="grid">
+                <div class="card">
+                    <h3>Foundation</h3>
+                    <p>Python basics, conditions, loops, functions, strings, lists, dictionaries and sets.</p>
+                </div>
+                <div class="card">
+                    <h3>Core patterns</h3>
+                    <p>Arrays, strings, two pointers, sliding window, searching and sorting.</p>
+                </div>
+                <div class="card">
+                    <h3>Data structures</h3>
+                    <p>Linked lists, stacks, queues, hash maps, heaps, trees and graphs.</p>
+                </div>
+                <div class="card">
+                    <h3>Advanced problem solving</h3>
+                    <p>Recursion, backtracking, greedy algorithms and dynamic programming.</p>
+                </div>
+            </div>
+            <p>Finish with regular practice, complexity analysis, mock interviews and revision.</p>
+        </section>
+
+        <section class="slide">
+            <div class="kicker">20 • Practice resources</div>
+            <h2>Where can you practise?</h2>
+            <div class="grid">
+                <div class="card">
+                    <h3>LeetCode</h3>
+                    <p>Interview-oriented coding problems.</p><a href="https://leetcode.com/" target="_blank"
+                        rel="noopener">leetcode.com ↗</a>
+                </div>
+                <div class="card">
+                    <h3>GeeksforGeeks</h3>
+                    <p>Explanations, tutorials and practice.</p><a href="https://www.geeksforgeeks.org/" target="_blank"
+                        rel="noopener">geeksforgeeks.org ↗</a>
+                </div>
+                <div class="card">
+                    <h3>HackerRank</h3>
+                    <p>Python and problem-solving practice.</p><a href="https://www.hackerrank.com/" target="_blank"
+                        rel="noopener">hackerrank.com ↗</a>
+                </div>
+                <div class="card">
+                    <h3>NeetCode</h3>
+                    <p>Structured interview preparation.</p><a href="https://neetcode.io/" target="_blank"
+                        rel="noopener">neetcode.io ↗</a>
+                </div>
+            </div>
+        </section>
+
+        <section class="slide">
+            <div class="kicker">21 • Industry expectations</div>
+            <h2>What do interviewers look for?</h2>
+            <ul>
+                <li>Understand and clarify the problem.</li>
+                <li>Explain a simple approach first.</li>
+                <li>Write a correct working solution.</li>
+                <li>Consider edge cases.</li>
+                <li>Improve time and space complexity.</li>
+                <li>Communicate your reasoning clearly.</li>
+            </ul>
+            <div class="analogy">The goal is not to memorize 100 algorithms. The goal is to become confident at breaking
+                unfamiliar problems into steps.</div>
+        </section>
+
+        <section class="slide">
+            <div class="kicker">22 • Quick knowledge check</div>
+            <h2>Test your DSA understanding</h2>
+            <div class="card">
+                <p id="quizQuestion" class="big">Which data structure follows LIFO?</p>
+                <div id="quizOptions"></div>
+                <div id="quizFeedback" class="feedback"></div>
+                <div class="controls"><button class="btn secondary" onclick="nextQuestion()">Next question</button><span
+                        class="pill" id="quizCount">Question 1 / 6</span></div>
+            </div>
+        </section>
+
+        <section class="slide">
+            <div class="kicker">23 • Take-home activity</div>
+            <h2>Build a mini student marks manager</h2>
+            <p>Use a list and dictionary to build a simple program that can:</p>
+            <ol>
+                <li>Store student names and marks.</li>
+                <li>Find the highest mark.</li>
+                <li>Search for a student.</li>
+                <li>Sort marks in descending order.</li>
+                <li>Count how many students passed.</li>
+            </ol>
+            <div class="analogy">Try it yourself first. Then explain the data structure and algorithm you selected,
+                including time and space complexity.</div>
+        </section>
+
+        <section class="slide">
+            <div class="kicker">24 • Closing</div>
+            <h1>Think clearly.<br><span class="accent">Solve efficiently.</span></h1>
+            <p class="big">Python helps you write programs. DSA helps you think like a software engineer.</p>
+            <p>Start small. Practise consistently. Understand the logic. Measure the efficiency.</p>
+            <div class="tag">Thank you</div>
+            <div class="tag">Questions & answers</div>
+        </section>
+    </div>
+
+    <div class="nav">
+        <button id="prev" onclick="move(-1)">← Prev</button>
+        <div class="progress"><span id="progress"></span></div>
+        <div class="counter" id="counter">1 / 24</div>
+        <button id="next" onclick="move(1)">Next →</button>
+        <button onclick="toggleFullscreen()" title="Fullscreen">⛶</button>
+        <button onclick="window.print()" title="Print slides">Print</button>
+    </div>
+    <script>
+        const slides = [...document.querySelectorAll('.slide')]; let current = 0;
+        function show(i) { current = Math.max(0, Math.min(slides.length - 1, i)); slides.forEach((s, n) => s.classList.toggle('active', n === current)); document.getElementById('counter').textContent = `${current + 1} / ${slides.length}`; document.getElementById('progress').style.width = ((current + 1) / slides.length * 100) + '%'; document.getElementById('prev').disabled = current === 0; document.getElementById('next').disabled = current === slides.length - 1 }
+        function move(d) { show(current + d) } document.addEventListener('keydown', e => { if (e.key === 'ArrowRight' || e.key === 'PageDown' || e.key === ' ') { e.preventDefault(); move(1) } if (e.key === 'ArrowLeft' || e.key === 'PageUp') { e.preventDefault(); move(-1) } });
+        function toggleFullscreen() { if (!document.fullscreenElement) document.documentElement.requestFullscreen?.(); else document.exitFullscreen?.() }
+        let marks = [85, 90, 75];
+        function renderList() { document.getElementById('listVisual').innerHTML = marks.map((v, i) => `<span class="cell">${v}<br><small>${i}</small></span>`).join('') }
+        function listAdd() { marks.push(95); renderList(); document.getElementById('listOut').textContent = 'Appended 95. Current list: ' + JSON.stringify(marks) }
+        function listAccess() { document.getElementById('listOut').textContent = 'marks[2] = ' + marks[2] + ' (third element; index starts at 0)' }
+        function listReset() { marks = [85, 90, 75]; renderList(); document.getElementById('listOut').textContent = 'List reset.' }
+        let stack = [];
+        function renderStack() { document.getElementById('stackVisual').innerHTML = stack.map((v, i) => `<span class="cell ${i === stack.length - 1 ? 'hot' : ''}">${v}</span>`).join('') || '<span class="muted">Empty</span>' }
+        function stackPush() { stack.push('Item ' + (stack.length + 1)); renderStack(); document.getElementById('stackOut').textContent = 'Push: added to top. Stack = ' + stack.join(', ') }
+        function stackPop() { let x = stack.pop(); renderStack(); document.getElementById('stackOut').textContent = x ? 'Pop: removed ' + x : 'Stack is empty.' }
+        let queue = [];
+        function renderQueue() { document.getElementById('queueVisual').innerHTML = queue.map((v, i) => `<span class="cell ${i === 0 ? 'hot' : ''}">${v}</span>`).join('') || '<span class="muted">Empty</span>' }
+        function queueAdd() { queue.push(['Ravi', 'Kiran', 'Sneha', 'Asha', 'Dev'][queue.length % 5]); renderQueue(); document.getElementById('queueOut').textContent = 'Joined at rear. Queue = ' + queue.join(' → ') }
+        function queueRemove() { let x = queue.shift(); renderQueue(); document.getElementById('queueOut').textContent = x ? 'Served first: ' + x : 'Queue is empty.' }
+        function runLinear(target = 40) { let a = [10, 20, 30, 40, 50, 60], checks = []; for (let x of a) { checks.push(x); if (x === target) break } document.getElementById('linearOut').textContent = `Target ${target}: ${checks.includes(target) ? 'found' : 'not found'}\\nChecked: ${checks.join(' → ')}\\nValues checked: ${checks.length}` }
+        function runLinearMissing() { runLinear(100) }
+        let bVals = [10, 20, 30, 40, 50, 60, 70, 80], lo = 0, hi = 7, done = false;
+        function renderBinary() { document.getElementById('binaryVisual').innerHTML = bVals.map((v, i) => `<span class="cell ${i === Math.floor((lo + hi) / 2) && !done ? 'hot' : (i < lo || i > hi ? 'dim' : '')}">${v}<br><small>${i}</small></span>`).join('') }
+        function binaryStep() { if (done) { document.getElementById('binaryOut').textContent = 'Already found the target.'; return } if (lo > hi) { done = true; document.getElementById('binaryOut').textContent = 'Target not found.'; renderBinary(); return } let mid = Math.floor((lo + hi) / 2), v = bVals[mid]; if (v === 60) { done = true; document.getElementById('binaryOut').textContent = `Middle is ${v} at index ${mid}. Target found!`; renderBinary(); return } if (v < 60) { document.getElementById('binaryOut').textContent = `Middle is ${v}. 60 is larger, discard left half.`; lo = mid + 1 } else { document.getElementById('binaryOut').textContent = `Middle is ${v}. 60 is smaller, discard right half.`; hi = mid - 1 } renderBinary() }
+        function binaryReset() { lo = 0; hi = 7; done = false; renderBinary(); document.getElementById('binaryOut').textContent = 'Find 60. Press Next step.' }
+        let bubble = [5, 3, 8, 4, 2], bi = 0, bj = 0;
+        function renderBubble() { document.getElementById('bubbleVisual').innerHTML = bubble.map((v, i) => `<span class="cell ${i === bj || i === bj + 1 ? 'hot' : ''}">${v}</span>`).join('') }
+        function bubbleStep() { let n = bubble.length; if (bi >= n - 1) { document.getElementById('bubbleOut').textContent = 'Sorted: ' + bubble.join(', '); renderBubble(); return } if (bj < n - bi - 1) { let msg = `Compare ${bubble[bj]} and ${bubble[bj + 1]}. `; if (bubble[bj] > bubble[bj + 1]) { [bubble[bj], bubble[bj + 1]] = [bubble[bj + 1], bubble[bj]]; msg += 'Swap them.' } else msg += 'No swap.'; bj++; document.getElementById('bubbleOut').textContent = msg } else { bi++; bj = 0; document.getElementById('bubbleOut').textContent = 'Pass completed. Start next pass.' } renderBubble() }
+        function bubbleReset() { bubble = [5, 3, 8, 4, 2]; bi = 0; bj = 0; renderBubble(); document.getElementById('bubbleOut').textContent = 'Reset. Press Next comparison.' }
+        function bubbleRun() { bubble.sort((a, b) => a - b); bi = 4; bj = 0; renderBubble(); document.getElementById('bubbleOut').textContent = 'Sorted result: ' + bubble.join(', ') }
+        function checkPalindrome() { let w = document.getElementById('palInput').value.trim().toLowerCase(); document.getElementById('palOut').textContent = w ? (w === Array.from(w).reverse().join('') ? 'Palindrome ✓' : 'Not a palindrome ✕') : 'Please enter a word.' }
+        const quiz = [['Which data structure follows LIFO?', ['Queue', 'Stack', 'Tree'], 1, 'A stack removes the most recently added item first.'], ['Which Python structure stores key-value pairs?', ['List', 'Tuple', 'Dictionary'], 2, 'A dictionary maps keys to values.'], ['Which search requires sorted input?', ['Linear', 'Binary', 'Neither'], 1, 'Binary search repeatedly halves a sorted search range.'], ['Worst-case linear search?', ['O(1)', 'O(log n)', 'O(n)'], 2, 'It may inspect all n elements.'], ['Which structure models a social network?', ['Graph', 'Stack', 'Tuple'], 0, 'Graphs model entities and their connections.'], ['Worst-case basic bubble sort?', ['O(n)', 'O(n²)', 'O(log n)'], 1, 'Nested adjacent comparisons lead to quadratic growth.']];
+        let qi = 0, answered = false;
+        function renderQuiz() { let q = quiz[qi]; document.getElementById('quizQuestion').textContent = q[0]; document.getElementById('quizOptions').innerHTML = q[1].map((v, i) => `<button class="quiz-option" onclick="answerQuiz(${i})">${String.fromCharCode(65 + i)}. ${v}</button>`).join(''); document.getElementById('quizFeedback').textContent = ''; document.getElementById('quizCount').textContent = `Question ${qi + 1} / ${quiz.length}`; answered = false }
+        function answerQuiz(i) { if (answered) return; answered = true; let q = quiz[qi], opts = [...document.querySelectorAll('.quiz-option')]; opts[q[2]].classList.add('correct'); if (i !== q[2]) opts[i].classList.add('wrong'); document.getElementById('quizFeedback').textContent = q[3] }
+        function nextQuestion() { qi = (qi + 1) % quiz.length; renderQuiz() }
+        const growth = [['O(1)', 1], ['O(log n)', 10], ['O(n)', 1000], ['O(n log n)', 10000], ['O(n²)', 1000000]];
+        document.getElementById('complexityBars').innerHTML = growth.map(([name, v]) => `<div><div style="display:flex;justify-content:space-between"><strong>${name}</strong><span class="muted">${v.toLocaleString('en-US')}</span></div><div class="bar"><span style="width:${Math.max(2, Math.log10(v + 1) / 6 * 100)}%"></span></div></div>`).join('');
+        renderList(); renderStack(); renderQueue(); renderBinary(); renderBubble(); renderQuiz(); show(0);
+    </script>
+</body>
+
+</html>
