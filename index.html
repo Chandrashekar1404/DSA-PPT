@@ -424,49 +424,7 @@
             }
         }
 
-        @media print {
-            body {
-                overflow: visible;
-                background: white;
-                color: #111
-            }
-
-            .deck {
-                display: block;
-                height: auto;
-                padding: 0
-            }
-
-            .slide {
-                display: block !important;
-                page-break-after: always;
-                width: 100%;
-                height: auto;
-                min-height: 95vh;
-                box-shadow: none;
-                background: white;
-                color: #111;
-                border: 0
-            }
-
-            .slide p,
-            .slide li {
-                color: #222
-            }
-
-            .nav {
-                display: none
-            }
-
-            .card {
-                background: #f2f5f8;
-                color: #111
-            }
-
-            .codebox {
-                break-inside: avoid
-            }
-        }
+        
     </style>
 </head>
 
@@ -963,7 +921,6 @@ print(frequency)</pre>
         <div class="counter" id="counter">1 / 24</div>
         <button id="next" onclick="move(1)">Next →</button>
         <button onclick="toggleFullscreen()" title="Fullscreen">⛶</button>
-        <button onclick="window.print()" title="Print slides">Print</button>
     </div>
     <script>
         const slides = [...document.querySelectorAll('.slide')]; let current = 0;
